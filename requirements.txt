@@ -6,4 +6,5 @@ requests
 beautifulsoup4
 apify_client
 streamlit
+uvicorn
 python-dotenv
