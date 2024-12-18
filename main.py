@@ -32,7 +32,7 @@ def get_report(search_query):
                 print(images.get("profilePic"))
         
     else:
-        st.session_state.images=None
+        st.session_state.images=[]
         st.session_state.summaries=None
 
 
@@ -50,7 +50,7 @@ def extract_image_links(json_data):
 
 
 def search_func():
-    st.session_state.images = None
+    st.session_state.images = []
     if st.session_state.search_query:
 
         with st.spinner(text="Loading Summary...",_cache=True):
