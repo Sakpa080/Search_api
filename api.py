@@ -15,7 +15,7 @@ AUTH_TOKEN=os.getenv('A_T')
 
 
 @app.get("/getReport")
-def getReport(search_query):
+async def getReport(search_query):
     result =[]
     def extract_links(json_data):
         items = json_data.get("items", [])
@@ -87,7 +87,7 @@ def getReport(search_query):
 
 
 @app.get("/getReportInstagram")
-def getReportInstgramSupport(search_query):
+async def getReportInstgramSupport(search_query):
     result =[]
     def extract_links(json_data):
         items = json_data.get("items", [])
@@ -152,7 +152,7 @@ def getReportInstgramSupport(search_query):
 
 
 @app.get("/")
-def home():
+async def home():
      return({"Message":"deployed"})
 
 
