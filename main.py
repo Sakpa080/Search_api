@@ -29,7 +29,7 @@ def get_report(search_query):
         st.session_state.summaries = data
         for images in st.session_state.summaries:
                 st.session_state.images.append(images.get("profilePic"))
-                st.session_state.userNames.append(st.session_state.summaries[url].get("username"))
+                st.session_state.userNames.append(images.get("username"))
                 print(images.get("profilePic"))
         
     else:
