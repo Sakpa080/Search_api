@@ -77,7 +77,7 @@ if st.session_state.images:
             st.image(image, caption=f"@{ st.session_state.summaries[url].get("username")} Profile Picture ")
             st.info(f"Bio: { st.session_state.summaries[url].get("biography")}",icon="🥇")
             st.write(f"Full Name :red-background[{ st.session_state.summaries[url].get("fullName")}]")
-            st.write(f"Username :blue-background[{ st.session_state.summaries[url].get("username")}]")
+            st.write(f"Username @:blue-background[{ st.session_state.summaries[url].get("username")}]")
             st.write(f"Number of People Following @{st.session_state.summaries[url].get('username')} :green-background[{ st.session_state.summaries[url].get("No_of_followers")}]")
             st.write(f"Number of people @{st.session_state.summaries[url].get('username')} follows: :blue-background[{ st.session_state.summaries[url].get("No_of_following")}]")
             st.write(st.session_state.summaries[url].get("relatedProfiles"))
