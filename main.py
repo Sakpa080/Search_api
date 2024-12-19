@@ -74,13 +74,15 @@ if st.session_state.images:
             response = requests.get(st.session_state.images[url])
             image = Image.open(BytesIO(response.content))
             # Display image
-            st.image(image, caption=f"{ st.session_state.summaries[url].get("username")} Profile Picture ")
+            st.image(image, caption=f"@{ st.session_state.summaries[url].get("username")} Profile Picture ")
             st.info(f"Bio: { st.session_state.summaries[url].get("biography")}",icon="🥇")
-            st.write(f"# :red-background[{ st.session_state.summaries[url].get("fullName")}]")
-            st.write(f"#### :green-background[{ st.session_state.summaries[url].get("No_of_followers")}]")
-            st.write(f"#### :blue-background[{ st.session_state.summaries[url].get("No_of_following")}]")
+            st.write(f"Full Name :red-background[{ st.session_state.summaries[url].get("fullName")}]")
+            st.write(f"Number of People Following @{st.session_state.summaries[url].get('username')} :green-background[{ st.session_state.summaries[url].get("No_of_followers")}]")
+            st.write(f"Number of people @{st.session_state.summaries[url].get('username')} follows: :blue-background[{ st.session_state.summaries[url].get("No_of_following")}]")
             st.write(st.session_state.summaries[url].get("relatedProfiles"))
-            
+            st.write(st.session_state.summaries[url].get("main"))
+            st.divider()
+            st.divider()
         except Exception as e:
             st.warning(f"something went wrong while trying to access this url:{st.session_state.images[url]}")
 
