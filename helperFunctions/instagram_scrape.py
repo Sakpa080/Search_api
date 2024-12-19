@@ -39,7 +39,7 @@ def instagram_scraping_function(instagramLink):
             "biography": mainList[0].get('biography', None),
             "isVerified": mainList[0].get('verified', None),
             "username": mainList[0].get('username', None),
-            "fullName": mainList[0].get('full_name', None) ,
+            "fullName": mainList[0].get('fullName', None) ,
             "No_of_followers": mainList[0].get("followersCount", None),
             "No_of_following": mainList[0].get("followsCount", None),
             "relatedProfiles": mainList[0].get('relatedProfiles', None),

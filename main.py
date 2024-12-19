@@ -30,8 +30,7 @@ def get_report(search_query):
         for images in st.session_state.summaries:
                 st.session_state.images.append(images.get("profilePic"))
                 st.session_state.userNames.append(images.get("username"))
-                print(images.get("profilePic"))
-        
+            
     else:
         st.session_state.images=[]
         st.session_state.summaries=None
