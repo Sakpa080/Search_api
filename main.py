@@ -29,6 +29,7 @@ def get_report(search_query):
         st.session_state.summaries = data
         for images in st.session_state.summaries:
                 st.session_state.images.append(images.get("profilePic"))
+                st.session_state.userNames.append(st.session_state.summaries[url].get("username"))
                 print(images.get("profilePic"))
         
     else:
@@ -43,6 +44,10 @@ if "images" not in st.session_state:
 
 if "summaries" not in st.session_state:
     st.session_state.summaries=None
+
+if "userNames" not in st.session_state:
+    st.session_state.userNames=[]
+
 def extract_image_links(json_data):
     items = json_data.get("items", [])
     image_links = [item.get("link") for item in items if "link" in item]
@@ -51,10 +56,11 @@ def extract_image_links(json_data):
 
 def search_func():
     st.session_state.images = []
+    st.session_state.userNames=[]
     if st.session_state.search_query:
-
         with st.spinner(text="Loading Summary...",_cache=True):
             get_report(search_query=st.session_state.search_query)
+            
             
         # Print results
         
@@ -68,22 +74,25 @@ st.set_page_config(page_title="Ambassador Search engine with AI",page_icon="👾
 st.text_input("what are you looking for ?",key="search_query")
 st.button("Search",on_click=search_func)
 if st.session_state.images:
-    for url in range(len(st.session_state.images)):
+    tabs = st.tabs(st.session_state.userNames)
+    for url,tab in enumerate(tabs):
+         
     # Fetch image from the URL
         try:
             response = requests.get(st.session_state.images[url])
             image = Image.open(BytesIO(response.content))
             # Display image
-            st.image(image, caption=f"@{ st.session_state.summaries[url].get("username")} Profile Picture ")
-            st.info(f"Bio: { st.session_state.summaries[url].get("biography")}",icon="🥇")
-            st.write(f"Full Name :red-background[{ st.session_state.summaries[url].get("fullName")}]")
-            st.write(f"Username @:blue-background[{ st.session_state.summaries[url].get("username")}]")
-            st.write(f"Number of People Following @{st.session_state.summaries[url].get('username')} :green-background[{ st.session_state.summaries[url].get("No_of_followers")}]")
-            st.write(f"Number of people @{st.session_state.summaries[url].get('username')} follows: :blue-background[{ st.session_state.summaries[url].get("No_of_following")}]")
-            st.write(st.session_state.summaries[url].get("relatedProfiles"))
-            st.write(st.session_state.summaries[url].get("main"))
-            st.divider()
-            st.divider()
+            with tab:
+                st.image(image, caption=f"@{ st.session_state.summaries[url].get("username")} Profile Picture ")
+                st.info(f"Bio: { st.session_state.summaries[url].get("biography")}",icon="🥇")
+                st.write(f"Full Name :red-background[{ st.session_state.summaries[url].get("fullName")}]")
+                st.write(f"Username @:blue-background[{ st.session_state.summaries[url].get("username")}]")
+                st.write(f"Number of People Following @{st.session_state.summaries[url].get('username')} :green-background[{ st.session_state.summaries[url].get("No_of_followers")}]")
+                st.write(f"Number of people @{st.session_state.summaries[url].get('username')} follows: :blue-background[{ st.session_state.summaries[url].get("No_of_following")}]")
+                st.write(st.session_state.summaries[url].get("relatedProfiles"))
+                st.write(st.session_state.summaries[url].get("main"))
+                st.divider()
+                st.divider()
         except Exception as e:
             st.warning(f"something went wrong while trying to access this url:{st.session_state.images[url]}")
 
