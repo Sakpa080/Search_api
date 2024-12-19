@@ -133,6 +133,8 @@ async def getReportInstgramSupport(search_query):
                     print(extract_base_url(url=url))
                     result.append(response)  
                     main_content=result
+                    print("_________________________________________________________________________________")
+                    print(extract_base_url(url=url))
                 except Exception as e:
                      print(e)
                      main_content=url
@@ -144,7 +146,7 @@ async def getReportInstgramSupport(search_query):
                      res = [[{"Error":f"This url:{url} couldn't be scraped"}]]
                      result.append(res)
                
-                print("_________________________________________________________________________________")
+                
               
                 
                 print("_________________________________________________________________________________")

@@ -43,6 +43,7 @@ def instagram_scraping_function(instagramLink):
             "No_of_followers": mainList[0].get("followersCount", None),
             "No_of_following": mainList[0].get("followsCount", None),
             "relatedProfiles": mainList[0].get('relatedProfiles', None),
+            "profileLink": mainList[0].get("inputUrl",None),
             "main":mainList[0]
         }
 
