@@ -73,15 +73,14 @@ if st.session_state.images:
         try:
             response = requests.get(st.session_state.images[url])
             image = Image.open(BytesIO(response.content))
-            
             # Display image
             st.image(image, caption=f"{ st.session_state.summaries[url].get("username")} Profile Picture ")
             st.info(f"Bio: { st.session_state.summaries[url].get("biography")}",icon="🥇")
-            st.write(f"# :red[{ st.session_state.summaries[url].get("fullName")}]")
-            st.write(f"#### :green[{ st.session_state.summaries[url].get("No_of_followers")}]")
-            st.write(f"#### :blue[{ st.session_state.summaries[url].get("No_of_following")}]")
+            st.write(f"# :red-background[{ st.session_state.summaries[url].get("fullName")}]")
+            st.write(f"#### :green-background[{ st.session_state.summaries[url].get("No_of_followers")}]")
+            st.write(f"#### :blue-background[{ st.session_state.summaries[url].get("No_of_following")}]")
             st.write(st.session_state.summaries[url].get("relatedProfiles"))
-            st.markdown()
+            
         except Exception as e:
             st.warning(f"something went wrong while trying to access this url:{st.session_state.images[url]}")
 
