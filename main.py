@@ -68,13 +68,22 @@ st.set_page_config(page_title="Ambassador Search engine with AI",page_icon="👾
 st.text_input("what are you looking for ?",key="search_query")
 st.button("Search",on_click=search_func)
 if st.session_state.images:
-    for url in st.session_state.images:
+    for url in range(len(st.session_state.images)):
     # Fetch image from the URL
-        response = requests.get(url)
-        image = Image.open(BytesIO(response.content))
-        
-        # Display image
-        st.image(image, caption="Profile Picture from Ig Page")
+        try:
+            response = requests.get(st.session_state.images[url])
+            image = Image.open(BytesIO(response.content))
+            
+            # Display image
+            st.image(image, caption=f"{ st.session_state.summaries[url].get("username")} Profile Picture ")
+            st.info(f"Bio: { st.session_state.summaries[url].get("biography")}",icon="🥇")
+            st.write(f"# :red[{ st.session_state.summaries[url].get("fullName")}]")
+            st.write(f"#### :green[{ st.session_state.summaries[url].get("No_of_followers")}]")
+            st.write(f"#### :blue[{ st.session_state.summaries[url].get("No_of_following")}]")
+            st.write(st.session_state.summaries[url].get("relatedProfiles"))
+            st.markdown()
+        except Exception as e:
+            st.warning(f"something went wrong while trying to access this url:{st.session_state.images[url]}")
 
 
 if st.session_state.summaries:

@@ -116,12 +116,15 @@ async def getReportInstgramSupport(search_query):
             "num": num_results,
             "start": start,
         }
-
-        response = requests.get(url, params=params)
-        if response.status_code == 200:
-            return response.json()  # JSON response containing the search results
-        else:
-            raise Exception(f"Error {response.status_code}: {response.text}")
+        try:
+            response = requests.get(url, params=params)
+            if response.status_code == 200:
+                return response.json()  # JSON response containing the search results
+            else:
+                return (f"Error {response.status_code}: {response.text}")
+        except Exception as e:
+             return e
+             
 
     for url in extract_links(google_custom_search(query=f"{search_query}")):
                 print(url)
