@@ -9,6 +9,69 @@ GOOGLE_APIKEY = os.getenv('G_API')
 SEARCHID=os.getenv('S_ID')
 BASE_URL = os.getenv('BASE_URL')
 
+from openai import OpenAI
+client = OpenAI()
+
+
+# Define the initial messages array
+messages = [
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "I'm looking for someone to represent my brand help me write a search query for google to make it possible to find a brand ambassador my brand is of a pet care category and the business is based in london"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": " pet care brand ambassador London."
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "I'm looking for someone to represent my brand help me write a search query for google to make it possible to find a brand ambassador my brand is of a pet care category and the business is based in Nigeria"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": " pet care brand ambassador Nigeria."
+            }
+        ]
+    },
+    {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": "I'm looking for someone to represent my brand help me write a search query for google to make it possible to find a brand ambassador my brand is of a Security Service category and the business is based in New york"
+            }
+        ]
+    },
+    {
+        "role": "assistant",
+        "content": [
+            {
+                "type": "text",
+                "text": " security service brand ambassador New York."
+            }
+        ]
+    }
+]
+
+
 
 
 def get_report(search_query):
@@ -70,7 +133,46 @@ def search_func():
 
 st.set_page_config(page_title="Ambassador Search engine with AI",page_icon="👾")
 st.write("# Brand Ambassador Finder")
-st.text_input("what are you looking for ?",key="search_query")
+
+
+
+st.selectbox(label="where is your brand based in?",options=["Nigeria","London","New york"],key="brand_location")
+st.selectbox(label="What category or industry is your brand focused on?",options=["Pet care","Security Services", "Luxury shoes", "Bespoke interior Designs"],key="brand_category")
+st.text_input(label="What values or traits are most important to your brand when choosing an ambassador?(optional)",key="extra")
+if st.button("Generate Search query"):
+    new_user_input = {
+        "role": "user",
+        "content": [
+            {
+                "type": "text",
+                "text": f"I'm looking for someone to represent my brand help me write a search query for google to make it possible to find a brand ambassador my brand is of a {st.session_state.brand_category} category and the business is based in {st.session_state.brand_location} extra information--{st.session_state.extra}"
+            }
+        ]
+    }
+
+    # Append the new user input to the messages
+    messages.append(new_user_input)
+
+    # Make the API call
+    response = client.chat.completions.create(
+        model="ft:gpt-3.5-turbo-1106:group-c::AgwZVJPq",
+        messages=messages,
+        response_format={
+            "type": "text"
+        },
+        temperature=1,
+        max_completion_tokens=2048,
+        top_p=1,
+        frequency_penalty=0,
+        presence_penalty=0
+    )
+
+    # Extract and print the assistant's response
+    assistant_response = response["choices"][0]["message"]["content"]
+    st.session_state.search_query= assistant_response
+print(assistant_response)
+
+st.text_input("what are you looking for ?",key="search_query",disabled=True)
 st.button("Search",on_click=search_func)
 if st.session_state.images:
     tabs = st.tabs(st.session_state.userNames)
