@@ -74,7 +74,7 @@ messages = [
 
 
 
-
+@st.cache_data(persist="disk")
 def get_report(search_query):
     # Define the base URL (this should be the server or API endpoint you're hitting)
     request_url =f"{BASE_URL}/getReportInstagram" 
