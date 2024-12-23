@@ -4,7 +4,7 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 OpenAI_API_KEY = os.getenv("OAK")
-client = OpenAI(OpenAI_API_KEY)
+client = OpenAI(api_key=OpenAI_API_KEY)
 
 
 def Ai_stuff(content,item_name):
