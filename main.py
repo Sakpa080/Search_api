@@ -113,7 +113,7 @@ async def search_For_Stuff_With_Ai(search_query):
 
 @app.get("/")
 async def home():
-     return({"Message":"nathy's project deployed successfully nice job ✔️"})
+     return({"Message":"Deployed successfully nice job ✔️"})
 
 
 
