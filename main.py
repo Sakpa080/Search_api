@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 app = FastAPI()
 GOOGLE_APIKEY = os.getenv('G_API')
-SEARCHID="e47e5a76a7a404ac3"
+SEARCHID=os.getenv('S_ID')
 AUTH_TOKEN=os.getenv('A_T')
 
 OpenAI_API_KEY = os.getenv("OAK")
