@@ -1,9 +1,7 @@
 from bs4 import BeautifulSoup
 from fastapi import FastAPI, HTTPException, Query
-from helperFunctions.instagram_scrape import instagram_scraping_function
 from helperFunctions.Aistuff import Ai_stuff
 from helperFunctions.ImageSearcher import imageSearcher
-from helperFunctions.url_regex import extract_base_url
 import os
 import requests
 from dotenv import load_dotenv
@@ -182,72 +180,6 @@ async def searchForStuffWithAi(search_query):
     return filter_results(results=result) 
 
 
-
-@app.get("/getReportInstagram")
-async def getReportInstgramSupport(search_query):
-    result =[]
-    def extract_links(json_data):
-        items = json_data.get("items", [])
-        image_links = [item.get("link") for item in items if "link" in item]
-        return image_links
-
-    def google_custom_search( query, num_results=3, start=1):
-        """
-        Perform a custom Google search using Google Custom Search JSON API.
-        
-        Args:
-            api_key (str): Your Google API key.
-            cx (str): Your custom search engine ID.
-            query (str): The search query.
-            num_results (int): Number of results to fetch (default: 10, max: 10 per request).
-            start (int): Starting index of search results (default: 1).
-
-        Returns:
-            dict: The search results.
-        """
-        url = "https://www.googleapis.com/customsearch/v1"
-        params = {
-            "key": GOOGLE_APIKEY,
-            "cx": SEARCHID,
-            "q": query,
-            "num": num_results,
-            "start": start,
-        }
-        try:
-            response = requests.get(url, params=params)
-            if response.status_code == 200:
-                return response.json()  # JSON response containing the search results
-            else:
-                return (f"Error {response.status_code}: {response.text}")
-        except Exception as e:
-             return e
-             
-
-    for url in extract_links(google_custom_search(query=f"{search_query}")):
-                print(url)
-                try:
-                    response = instagram_scraping_function(extract_base_url(url=url))
-                    print(extract_base_url(url=url))
-                    result.append(response)  
-                    main_content=result
-                    print("_________________________________________________________________________________")
-                    print(extract_base_url(url=url))
-                except Exception as e:
-                     print(e)
-                     main_content=url
-                    
-              
-                
-                
-                if url == main_content:
-                     res = [[{"Error":f"This url:{url} couldn't be scraped"}]]
-                     result.append(res)
-               
-                
-              
-                
-                print("_________________________________________________________________________________")
-    return result 
 
 
 
