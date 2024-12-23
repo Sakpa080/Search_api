@@ -1,11 +1,5 @@
 requests
-# tensorflow
-# huggingface
-# transformer
-# tf-keras
 beautifulsoup4
-apify_client
-streamlit
 fastapi
 openai
 uvicorn
