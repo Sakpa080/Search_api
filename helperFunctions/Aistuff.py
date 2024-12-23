@@ -1,6 +1,6 @@
 from openai import OpenAI
 import json
-
+import os
 from dotenv import load_dotenv
 load_dotenv()
 OpenAI_API_KEY = os.getenv("OAK")
