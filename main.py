@@ -3,6 +3,8 @@ from fastapi import FastAPI, HTTPException, Query
 from helperFunctions.Aistuff import Ai_stuff
 from helperFunctions.ImageSearcher import imageSearcher
 import os
+from typing import List, Dict, Any, Optional
+
 import requests
 from dotenv import load_dotenv
 load_dotenv()
@@ -15,28 +17,21 @@ OpenAI_API_KEY = os.getenv("OAK")
 
 
 
+
+
 @app.get("/search")
-async def search_For_Stuff_With_Ai(search_query):
-    result =[]
+async def search_For_Stuff_With_Ai(
+    search_query: str,
+    start: int = 1,
+    max_attempts: int = 5,
+) -> List[Dict[str, Any]]:
+    result = []
+
     def extract_links(json_data):
         items = json_data.get("items", [])
-        image_links = [item.get("link") for item in items if "link" in item]
-        return image_links
+        return [item.get("link") for item in items if "link" in item]
 
-    def google_custom_search( query, num_results=3, start=1):
-        """
-        Perform a custom Google search using Google Custom Search JSON API.
-        
-        Args:
-            api_key (str): Your Google API key.
-            cx (str): Your custom search engine ID.
-            query (str): The search query.
-            num_results (int): Number of results to fetch (default: 10, max: 10 per request).
-            start (int): Starting index of search results (default: 1).
-
-        Returns:
-            dict: The search results.
-        """
+    def google_custom_search(query, num_results=3, start=start):
         url = "https://www.googleapis.com/customsearch/v1"
         params = {
             "key": GOOGLE_APIKEY,
@@ -45,67 +40,75 @@ async def search_For_Stuff_With_Ai(search_query):
             "num": num_results,
             "start": start,
         }
-
         response = requests.get(url, params=params)
         if response.status_code == 200:
-            return response.json()  # JSON response containing the search results
+            return response.json()
         else:
             raise Exception(f"Error {response.status_code}: {response.text}")
 
-    for url in extract_links(google_custom_search(query=f"{search_query}")):
+    def summarize_large_text(text, max_chunk_size=1024):
+        chunks = [text[i:i + max_chunk_size] for i in range(0, len(text), max_chunk_size)]
+        summaries = [Ai_stuff(chunk, search_query) for chunk in chunks]
+        img_urls = imageSearcher(f"Logo of {search_query}") or []
+        for summary in summaries:
+            for key, value in summary.items():
+                summary[key] = {"price": value, "image_urls": img_urls}
+        return summaries
+
+    def filter_results(resultlist):
+        filtered_results = []
+        for results in resultlist:
+            for result in results:
                 try:
-                    response = requests.get(url)
-                    html_content = response.text
-                    soup = BeautifulSoup(html_content, 'html.parser')
-                    main_content = soup.get_text(separator=" ", strip=True)  
-                except:
-                     main_content=url
-                    
-              
-                
-                API_URL = "https://api-inference.huggingface.co/models/facebook/bart-large-cnn"
-                headers = {"Authorization": f"Bearer {AUTH_TOKEN}"}
+                    for key, value in result.items():
+                        if value.get("price") is not None:
+                            filtered_results.append(result)
+                            break
+                except Exception as e:
+                    print(f"Error filtering results: {e}")
+        return filtered_results
 
-                def query(payload):
-                    response = requests.post(API_URL, headers=headers, json=payload)
-                    return response.json()
-
-                def summarize_large_text(text, max_chunk_size=1024):
-                    chunks = [text[i:i+max_chunk_size] for i in range(0, len(text), max_chunk_size)]
-                    summaries = [Ai_stuff(chunk,search_query) for chunk in chunks]
-                    for summary in summaries:
-                         for key,value in summary.items():
-                              image_urls= imageSearcher(key)
-                              
-                              summary[key]={
-                                   "price": value,
-                                   "image_urls": image_urls
-                              }
-                    return summaries
-                
-                if url == main_content:
-                     summary = [[{"error_text":f"This url:{url} couldn't be scraped"}]]
+    def get_links(query, max_attempts):
+        attempts = 0
+        all_links = []
+        while attempts < max_attempts:
+            try:
+                search_results = google_custom_search(query, num_results=3, start=start + attempts * 3)
+                links = extract_links(search_results)
+                if links:
+                    all_links.extend(links)
                 else:
-                    summary = summarize_large_text(main_content)
-                print("_________________________________________________________________________________")
-                print(summary,url)
-                result.append(summary[0])
-                print("_________________________________________________________________________________")
-                def filter_results(results):
-                    filtered_results = []
-                    
-                    # Iterate over the results
-                    for result in results:
-                        for key, value in result.items():
-                            # Check if price is not 'None'
-                            if value.get('price') != 'None':
-                                filtered_results.append(result)
-                                break  # No need to check further, move to the next result
-                    
-                    return filtered_results
-    return filter_results(results=result) 
+                    break
+            except Exception as e:
+                print(f"Error in link retrieval: {e}")
+            attempts += 1
+        return all_links
 
+    links = get_links(query=search_query, max_attempts=max_attempts)
 
+    for url in links:
+        try:
+            response = requests.get(url)
+            html_content = response.text
+            soup = BeautifulSoup(html_content, "html.parser")
+            main_content = soup.get_text(separator=" ", strip=True)
+        except Exception as e:
+            print(f"Error scraping URL {url}: {e}")
+            main_content = url  # Use URL as fallback content
+
+        summary = (
+            summarize_large_text(main_content)
+            if url != main_content
+            else [[{"error_text": f"URL {url} couldn't be scraped"}]]
+        )
+        result.append(summary)
+
+    filtered_results = filter_results(result)
+
+    if not filtered_results and start < 100:  # Arbitrary limit to prevent infinite loops
+        return await search_For_Stuff_With_Ai(search_query, start=start + 3, max_attempts=max_attempts)
+
+    return filtered_results
 
 
 

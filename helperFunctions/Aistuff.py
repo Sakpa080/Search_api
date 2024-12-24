@@ -7,7 +7,7 @@ OpenAI_API_KEY = os.getenv("OAK")
 client = OpenAI(api_key=OpenAI_API_KEY)
 
 
-def Ai_stuff(content,item_name):
+def Ai_stuff(content,item_name:str):
     messages=[
         {
         "role": "system",
@@ -33,6 +33,33 @@ def Ai_stuff(content,item_name):
             {
             "type": "text",
             "text": "{\n  \"2024 Lamborghini Huracán\": \"$249,865\"\n}"
+            }
+        ]
+        },
+        {
+        "role": "system",
+        "content": [
+            {
+            "type": "text",
+            "text": "You are a website scraper that scrape's the price's of things of a websites content \nreturn a json object if content contains the right information else return \"None\"\n\"name of item\": \"price of item\"\n"
+            }
+        ]
+        },
+        {
+        "role": "user",
+        "content": [
+            {
+            "type": "text",
+            "text": "What is the price of a  ' Bitcoin ' if the information is below return it else if the information isn't below return 'None' \n\nCars\nSedans, coupes, convertibles, and wagons\n2024 Lamborghini Huracán\n9.5\n/10\nC/D RATING\nStarting at\n$249,865\nEPA MPG\n15 combined\nC/D SAYS: The 2024 Huracán excels at everything important except being subtle, which makes it an ideal supercar and the perfect Lamborghini. Learn More\nEXPAND ALL MODEL YEARS\nLamborghini Huracán Model Years\nView 2024 Huracán Details\nStarting at $249,865 · 9.5/10\nView 2023 Huracán Details\nStarting at $212,090 · 9.5/10\nView 2022 Huracán Details\nStarting at $213,104 · 9.5/10\nView 2021 Huracán Details\nStarting at $214,866 · 9.5/10\nView 2020 Huracán Details\nStarting at $212,266 · 9.5/10\nView 2019 Huracán Details\nStarting at $209,469 · 10/10\nCOLLAPSE\n2025 Lamborghini Revuelto\n10\n/10\nC/D RATING\nStarting at\n$609,000 est\nEPA MPG\nN/A\nC/D SAYS: The Revuelto stays true to Lamborghini's 12-cylinder spirit while using hybrid tech to push past internal-combustion limitations. Learn More\nEXPAND ALL MODEL YEARS"
+            }
+        ]
+        },
+        {
+        "role": "assistant",
+        "content": [
+            {
+            "type": "text",
+            "text": "{\n  \"2024 Lamborghini Huracán\": \"None\"\n}"
             }
         ]
         }
@@ -61,4 +88,31 @@ def Ai_stuff(content,item_name):
     )
     
     assistant_response = response.choices[0].message.content
-    return json.loads(assistant_response)
+    try:
+        response = json.loads(assistant_response)
+        for k,v in response.items():
+            if "No" in v:
+                response ={item_name:None}
+            elif item_name not in k:
+                for item in  item_name.split(sep=" "):
+                    if item in k:
+                        break
+                    response = {item_name:None}
+
+            elif "The" in v:
+                response ={item_name:None}
+            elif "Crypto" in v:
+                response ={item_name:None}
+            elif "Started" in v:
+                response ={item_name:None}
+            elif "Unknown" in v:
+                response ={item_name:None}
+            elif "not" in v:
+                response ={item_name:None}
+            elif v == "$0":
+                response = {item_name:None}
+    except:
+        print(assistant_response)
+        response ={item_name: None }
+
+    return response
