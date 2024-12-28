@@ -1,3 +1,4 @@
+import pprint
 from openai import OpenAI
 import json
 import os
@@ -75,7 +76,7 @@ def Ai_stuff(content,item_name:str):
     }
     messages.append(new_user_input)
     response = client.chat.completions.create(
-    model="gpt-3.5-turbo-1106",
+    model="gpt-4o",
     messages=messages,
     response_format={
         "type": "json_object"
@@ -88,6 +89,8 @@ def Ai_stuff(content,item_name:str):
     )
     
     assistant_response = response.choices[0].message.content
+
+    pprint.pprint(assistant_response)
     try:
         response = json.loads(assistant_response)
         for k,v in response.items():
@@ -97,6 +100,8 @@ def Ai_stuff(content,item_name:str):
                 for item in  item_name.split(sep=" "):
                     if item in k:
                         break
+                    else:
+                        print(item,k)
                     response = {item_name:None}
 
             elif "The" in v:
@@ -112,7 +117,7 @@ def Ai_stuff(content,item_name:str):
             elif v == "$0":
                 response = {item_name:None}
     except:
-        print(assistant_response)
+        # print(assistant_response)
         response ={item_name: None }
 
     return response
