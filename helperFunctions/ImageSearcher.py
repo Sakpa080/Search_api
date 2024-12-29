@@ -42,6 +42,6 @@ def imageSearcher(stuff):
             response.append(items.get("image").get("thumbnailLink"))
         return response
     except Exception as e:
-         return e
+         return "None"
         
 

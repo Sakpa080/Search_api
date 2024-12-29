@@ -45,11 +45,12 @@ async def search_For_Stuff_With_Ai(
             return response.json()
         else:
             raise Exception(f"Error {response.status_code}: {response.text}")
+    img_urls = imageSearcher(f"Logo of {search_query}") or []
 
     def summarize_large_text(text, max_chunk_size=1024):
         chunks = [text[i:i + max_chunk_size] for i in range(0, len(text), max_chunk_size)]
         summaries = [Ai_stuff(chunk, search_query) for chunk in chunks]
-        img_urls = imageSearcher(f"Logo of {search_query}") or []
+        
         for summary in summaries:
             for key, value in summary.items():
                 summary[key] = {"price": value, "image_urls": img_urls}
@@ -104,6 +105,7 @@ async def search_For_Stuff_With_Ai(
         result.append(summary)
 
     filtered_results = filter_results(result)
+    print(filtered_results,start)
 
     if not filtered_results and start < 100:  # Arbitrary limit to prevent infinite loops
         return await search_For_Stuff_With_Ai(search_query, start=start + 3, max_attempts=max_attempts)
