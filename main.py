@@ -53,8 +53,8 @@ async def search_For_Stuff_With_Ai(
         
         for summary in summaries:
             for key, value in summary.items():
-                summary[key] = {"price": value, "image_urls": img_urls}
-        return summaries
+                summary[key] = {"name":key,"price": value, "image_urls": img_urls}
+        return summaries[key]
 
     def filter_results(resultlist):
         filtered_results = []
