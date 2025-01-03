@@ -56,20 +56,21 @@ async def search_For_Stuff_With_Ai(
             for key, value in summary.items():
                 summary[key] = {"name":key,"price": value, "image_urls": img_urls}
                 summariesList.append(summary[key])
+                print(summariesList)
         return summariesList
 
     def filter_results(resultlist):
         filtered_results = []
-        for results in resultlist:
-            for result in results:
-                try:
-                    for key, value in result.items():
-                        if value.get("price") is not None:
+        for result in resultlist:
+            try:
+                for key, value in result.items():
+                    if key == "price" and value != None:
                             filtered_results.append(result)
                             break
-                except Exception as e:
-                    print(f"Error filtering results: {e}")
+            except Exception as e:
+                print(f"Error filtering results: {e}")
         return filtered_results
+
 
     def get_links(query, max_attempts):
         attempts = 0
@@ -109,7 +110,7 @@ async def search_For_Stuff_With_Ai(
     filtered_results = filter_results(result)
     print(filtered_results,start)
 
-    if not filtered_results and start < 100:  # Arbitrary limit to prevent infinite loops
+    if not filtered_results and start < 9:  # Arbitrary limit to prevent infinite loops
         return await search_For_Stuff_With_Ai(search_query, start=start + 3, max_attempts=max_attempts)
 
     return filtered_results
