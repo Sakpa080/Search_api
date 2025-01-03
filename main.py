@@ -48,13 +48,15 @@ async def search_For_Stuff_With_Ai(
     img_urls = imageSearcher(f"Logo of {search_query}") or []
 
     def summarize_large_text(text, max_chunk_size=1024):
+        summariesList = []
         chunks = [text[i:i + max_chunk_size] for i in range(0, len(text), max_chunk_size)]
         summaries = [Ai_stuff(chunk, search_query) for chunk in chunks]
         
         for summary in summaries:
             for key, value in summary.items():
                 summary[key] = {"name":key,"price": value, "image_urls": img_urls}
-        return summaries[key]
+                summariesList.append(summary[key])
+        return summariesList
 
     def filter_results(resultlist):
         filtered_results = []
