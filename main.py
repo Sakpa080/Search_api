@@ -174,7 +174,7 @@ async def search_for_stuff_with_ai(
         for filtered_result in filtered_results:
             image_urls = imageSearcher(filtered_result["name"])
             returnable_result.append({"name":filtered_result["name"],"price":filtered_result["price"],"image_urls":image_urls})
-        if returnable_result != [] and returnable_result[0]['image_urls'].len()>1:    
+        if returnable_result != [] and returnable_result[0]['image_urls'].__len__()>1:    
             setCache(name=search_query.upper().strip(),value=returnable_result)
         return returnable_result
 
