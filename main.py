@@ -69,7 +69,7 @@ class SearchResultItem(BaseModel):
 async def search_for_stuff_with_ai(
     search_query: str,
     start: int = 1,
-    max_attempts: int = 3,
+
 ) -> List[Dict[str, Any]]:
     """
     Search for information using AI and Google Custom Search,
@@ -119,7 +119,6 @@ async def search_for_stuff_with_ai(
             """Filter results to include only those with a valid price."""
             filtered = []
             for result in result_list:
-                print("Result",result)
                 try:
                     if any(key == "price" and value is not None for key, value in result.items()):
                         filtered.append(result)
@@ -127,24 +126,23 @@ async def search_for_stuff_with_ai(
                     print(f"Error filtering results: {e}")
             return filtered
 
-        def get_links(query: str, max_attempts: int) -> List[str]:
+        def get_links(query: str) -> List[str]:
             """Retrieve a list of links from Google Custom Search with multiple attempts."""
             attempts = 0
             all_links = []
-            while attempts < max_attempts:
-                try:
-                    search_results = google_custom_search(query, num_results=3, start_index=start + attempts * 3)
-                    links = extract_links(search_results)
-                    if links:
-                        all_links.extend(links)
-                    else:
-                        break
-                except Exception as e:
+            try:
+                search_results = google_custom_search(query, num_results=3, start_index=start)
+                links = extract_links(search_results)
+                if links:
+                    all_links.extend(links)
+                else:
+                    pass
+            except Exception as e:
                     print(f"Error retrieving links: {e}")
-                attempts += 1
+               
             return all_links
 
-        links = get_links(query=search_query, max_attempts=max_attempts)
+        links = get_links(query=search_query)
 
         for url in links:
             try:
@@ -165,18 +163,13 @@ async def search_for_stuff_with_ai(
 
         filtered_results = filter_results(results)
         returnable_result=[]
-        print("___________Filtered result_____________")
-        pprint.pprint(filtered_results)
-        print("___________Filtered result_____________")
-
-        if not filtered_results and start < 4:  # Prevent infinite loops with an arbitrary limit
-            return await search_for_stuff_with_ai(search_query, start=start + 3, max_attempts=max_attempts)
+ 
         for filtered_result in filtered_results:
             image_urls = imageSearcher(filtered_result["name"])
             returnable_result.append({"name":filtered_result["name"],"price":filtered_result["price"],"image_urls":image_urls})
-        if returnable_result != [] and returnable_result[0]['image_urls'].len()>1:    
+        if returnable_result != [] and returnable_result[0]['image_urls'].__len__()>1:    
             setCache(name=search_query.upper().strip(),value=returnable_result)
-        return returnable_result
+        return returnable_result    
 
 
 
