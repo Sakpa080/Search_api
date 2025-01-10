@@ -38,10 +38,9 @@ def imageSearcher(stuff):
     response = []
     try:
         for items in google_custom_search(stuff).get("items"):
-            pprint.pprint(items.get("image").get("thumbnailLink"))
+            # pprint.pprint(items.get("image").get("thumbnailLink"))
             response.append(items.get("image").get("thumbnailLink"))
         return response
     except Exception as e:
-         return "None"
+         return response
         
-

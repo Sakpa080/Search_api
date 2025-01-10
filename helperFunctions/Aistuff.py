@@ -8,6 +8,7 @@ OpenAI_API_KEY = os.getenv("OAK")
 client = OpenAI(api_key=OpenAI_API_KEY)
 
 
+
 def Ai_stuff(content,item_name:str):
     messages=[
         {
@@ -90,7 +91,7 @@ def Ai_stuff(content,item_name:str):
     
     assistant_response = response.choices[0].message.content
 
-    pprint.pprint(assistant_response)
+    # pprint.pprint(assistant_response)
     try:
         response = json.loads(assistant_response)
         for k,v in response.items():
@@ -101,7 +102,7 @@ def Ai_stuff(content,item_name:str):
                     if item in k:
                         break
                     else:
-                        print(item,k)
+                        print("item",item,"k",k)
                     response = {item_name:None}
 
             elif "The" in v:
@@ -117,7 +118,6 @@ def Ai_stuff(content,item_name:str):
             elif v == "$0":
                 response = {item_name:None}
     except:
-        # print(assistant_response)
         response ={item_name: None }
 
     return response

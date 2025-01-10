@@ -3,4 +3,5 @@ beautifulsoup4
 fastapi
 openai
 uvicorn
+redis
 python-dotenv
