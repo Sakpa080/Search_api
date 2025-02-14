@@ -1,11 +1,13 @@
+import asyncio
 import pprint
 from bs4 import BeautifulSoup
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.responses import JSONResponse
 from helperFunctions.Aistuff import Ai_stuff
 from helperFunctions.ImageSearcher import imageSearcher
 import os
 from typing import List, Dict, Any, Optional
-
+from starlette.middleware.base import BaseHTTPMiddleware
 import requests
 from dotenv import load_dotenv
 load_dotenv()
@@ -15,6 +17,20 @@ SEARCHID=os.getenv('S_ID')
 AUTH_TOKEN=os.getenv('A_T')
 
 
+class TimeoutMiddleware(BaseHTTPMiddleware):
+    def __init__(self, app, timeout: int):
+        super().__init__(app)
+        self.timeout = timeout
+
+    async def dispatch(self, request, call_next):
+        try:
+            # Set a global timeout for all requests
+            response = await asyncio.wait_for(call_next(request), timeout=self.timeout)
+            return response
+        except asyncio.TimeoutError:
+            return JSONResponse(status_code=408, content={"detail": "Request Timeout"})
+
+app.add_middleware(TimeoutMiddleware, timeout=300)
 
 
 import json
@@ -126,7 +142,7 @@ async def search_for_stuff_with_ai(
                     print(f"Error filtering results: {e}")
             return filtered
 
-        def get_links(query: str) -> List[str]:
+        async def get_links(query: str) -> List[str]:
             """Retrieve a list of links from Google Custom Search with multiple attempts."""
             attempts = 0
             all_links = []
@@ -142,7 +158,11 @@ async def search_for_stuff_with_ai(
                
             return all_links
 
-        links = get_links(query=search_query)
+        try:
+            links = await asyncio.wait_for(get_links(search_query),timeout=30)
+        except asyncio.TimeoutError:
+            return JSONResponse(status_code=408, content={"detail": "Request Timeout"})
+
 
         for url in links:
             try:
@@ -155,7 +175,7 @@ async def search_for_stuff_with_ai(
                 main_content = url  # Fallback to URL if scraping fails
 
             summary = (
-                summarize_large_text(main_content)
+                await asyncio.wait_for(asyncio.to_thread(summarize_large_text, main_content),timeout=120)
                 if url != main_content
                 else [{"error_text": f"URL {url} couldn't be scraped"}]
             )

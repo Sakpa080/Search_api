@@ -5,3 +5,5 @@ openai
 uvicorn
 redis
 python-dotenv
+httpx
+asyncio
